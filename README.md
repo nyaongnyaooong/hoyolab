@@ -32,30 +32,31 @@
 $ npm install
 ```
 
+## Set Environment Variable
+
+```bash
+COOKIE_TOKEN=
+LTOKEN=
+LTUID=
+
+DISCORD_BOT_TOKEN=
+DISCORD_CHANNEL_ID=
+```
+
 ## Compile and run the project
 
 ```bash
 # development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
+$ yarn docker up dev
 
 # production mode
-$ npm run start:prod
-```
+$ yarn docker up
 
-## Run tests
+# stop development
+$ yarn docker down dev
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# stop production
+$ yarn docker down
 ```
 
 ## Deployment

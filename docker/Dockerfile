@@ -10,15 +10,17 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
+COPY .env ./
 
 # Install the application dependencies
-# RUN npm install
+RUN npm install
 
 # Copy the rest of the application code to the working directory
-COPY . .
+COPY dist ./dist
+# COPY . .
 
 # Build the NestJS application
-RUN npm run build
+# RUN npm run build && rm -rf src
 
 # Expose the port the app runs on
 EXPOSE 3000

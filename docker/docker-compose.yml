@@ -2,15 +2,12 @@ version: '3.8'
 
 services:
   server:
-    container_name: hoyolab-nest-dev
-    image: hoyolab-nest-dev:latest
+    container_name: hoyolab-nest
+    image: hoyolab-nest:latest
     build:
       context: ../
-      dockerfile: docker/dev.Dockerfile
-    volumes:
-      - ../src:/app/src
-      - ../node_modules:/app/node_modules
+      dockerfile: docker/Dockerfile
     ports:
       - "2075:3000"
     # command: ["npm", "run", "start:dev"]
-    command: npm run start:dev
+    command: npm run start:prod
