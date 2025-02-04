@@ -1,13 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosError, AxiosInstance } from 'axios';
-import { Client, Events, GatewayIntentBits } from 'discord.js';
+import { Client, EmbedBuilder, Events, GatewayIntentBits } from 'discord.js';
 import { DateTime } from 'luxon';
 
 @Injectable()
 export class DiscordService {
   private discordClient: Client;
   private discordToken: string;
+  private answerList: string[] = [
+    '망고여',
+    '망고얌',
+    '망고양',
+    '망고야',
+    '망고야~',
+  ];
 
   constructor() {
     // 토큰 초기화
@@ -40,7 +47,7 @@ export class DiscordService {
         }
       }
 
-      if (['망고야', '망고야~'].includes(message.content)) {
+      if (this.answerList.includes(message.content)) {
         message.reply('야옹~');
       }
     });
@@ -54,5 +61,25 @@ export class DiscordService {
       throw new BadRequestException('채널을 찾을 수 없습니다.');
     }
     return await channel.send(message);
+  }
+
+  async sendEmbedMessageToChannel(input: {
+    channelId: string;
+    title: string;
+    message: string;
+  }) {
+    const { channelId, title, message } = input;
+
+    const embed = new EmbedBuilder()
+      .setTitle(title)
+      .setDescription(message)
+      .setColor('#00FF00')
+      .setDescription(`\`\`\`fix\n${message}\`\`\``);
+
+    const channel = await this.discordClient.channels.fetch(channelId);
+    if (!channel || !channel.isSendable()) {
+      throw new BadRequestException('채널을 찾을 수 없습니다.');
+    }
+    return await channel.send({ embeds: [embed] });
   }
 }

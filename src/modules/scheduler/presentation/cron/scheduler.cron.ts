@@ -16,14 +16,29 @@ export class SchedulerCron {
   async attendAll() {
     const channelId = process.env.DISCORD_CHANNEL_ID;
     const result = await this.schedulerService.attendAll();
-    await this.discordService.sendMessageToChannel(
+    let message = '';
+    if (result.genshin.result) {
+      message += '원신 출석체크에 성공했어요.\n';
+    } else {
+      message += `원신 : ${result.genshin?.message ? `${result.genshin.message}` : '출석 체크 실패'}\n`;
+    }
+    
+    if (result.starRail.result) {
+      message += '스타레일 출석체크에 성공했어요.\n';
+    } else {
+      message += `스타레일 : ${result.starRail?.message ? `${result.starRail.message}` : '출석 체크 실패'}\n`;
+    }
+
+    await this.discordService.sendEmbedMessageToChannel({
       channelId,
-      JSON.stringify(result),
-    );
+      title: '출석체크 결과',
+      message,
+    });
   }
 
-  // 미리 정의된 표현식 사용
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  async updatePrices() {
+  // 공식 리딤 코드 확인 후 입력
+  @Cron(CronExpression.EVERY_DAY_AT_6AM)
+  async putOfficialCoupon() {
+    return await this.schedulerService.putOfficialCoupon();
   }
 }

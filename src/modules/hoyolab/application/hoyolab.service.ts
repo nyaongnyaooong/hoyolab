@@ -58,6 +58,7 @@ export class HoyolabService {
       `cookie_token_v2=${cookieToken};`,
       `ltoken_v2=${ltoken};`,
       `ltuid_v2=${ltuid};`,
+      `account_id_v2=${ltuid};`,
     ];
   }
   /**
@@ -81,4 +82,6 @@ export class HoyolabService {
     axiosInstance.defaults.headers.common['cookie'] = updatedCookies;
     return axiosInstance;
   }
+
+  
 }

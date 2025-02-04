@@ -29,15 +29,30 @@ export class HonkaiStarRailService {
           newCookie: setCookie,
         });
       }
+      console.log(response.data);
 
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return error.response?.data;
+      if (this.isSuccess(response.data)) {
+        return {
+          result: true,
+          message: response?.data?.message,
+        };
       }
+
+      return {
+        result: false,
+        message: response?.data?.message,
+      };
+    } catch (error) {
+      // if (error instanceof AxiosError) {
+      //   return error.response?.data;
+      // }
       console.log(error);
       throw new Error('Failed to get genshin attendance');
     }
+  }
+
+  private isSuccess(responseData: any) {
+    return responseData?.retcode === 0;
   }
 
   private _starRailUrl = {
