@@ -24,6 +24,7 @@ export class SlackService {
           text: string;
         }[];
       }[];
+      attachments?: any[];
       text?: string;
     };
   }) {

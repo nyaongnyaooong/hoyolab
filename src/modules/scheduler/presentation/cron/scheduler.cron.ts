@@ -107,33 +107,48 @@ export class SchedulerCron {
     const sendSlack = await this.slackService.sendMessageToChannel({
       webhookUrl: process.env.SLACK_WEBHOOK_URL,
       body: {
-        blocks: [
+        // blocks: [
+        //   {
+        //     type: 'header',
+        //     text: {
+        //       type: 'plain_text',
+        //       text: '📣 결계 알림',
+        //       emoji: true,
+        //     },
+        //   },
+        //   {
+        //     type: 'section',
+        //     text: {
+        //       type: 'mrkdwn',
+        //       text: message,
+        //     },
+        //   },
+        //   {
+        //     type: 'context',
+        //     elements: [
+        //       {
+        //         type: 'mrkdwn',
+        //         text: `🕐 ${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
+        //       },
+        //     ],
+        //   },
+        // ],
+        // text 필드는 알림이 올 때 보이는 폴백 메시지로 사용됩니다
+        attachments: [
           {
-            type: 'header',
-            text: {
-              type: 'plain_text',
-              text: '📣 결계 알림',
-              emoji: true,
-            },
-          },
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: message,
-            },
-          },
-          {
-            type: 'context',
-            elements: [
+            color: '#36a64f',
+            fields: [
               {
-                type: 'mrkdwn',
-                text: `🕐 ${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
+                title: '📣 결계 알림',
+                value: message,
+                short: true,
               },
             ],
+            footer: 'GitHub Actions',
+            // footer_icon: 'https://github.githubassets.com/favicon.ico',
+            ts: `🕐 ${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
           },
         ],
-        // text 필드는 알림이 올 때 보이는 폴백 메시지로 사용됩니다
         text: message,
       },
     });
