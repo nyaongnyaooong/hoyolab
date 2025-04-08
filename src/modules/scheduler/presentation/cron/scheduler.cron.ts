@@ -55,8 +55,6 @@ export class SchedulerCron {
     //   message,
     // });
     // console.log(sendDiscord);
-    if (this.testKey) return;
-    this.testKey = 1;
 
     const sendDiscordWebhook = await this.discordService.sendWebhookMessage({
       webhookUrl: process.env.DISCORD_WEBHOOK_URL,
