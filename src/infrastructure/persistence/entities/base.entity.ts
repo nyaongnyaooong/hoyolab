@@ -13,18 +13,17 @@ export function BaseEntity<T extends IdType>(idType: T) {
     @PrimaryGeneratedColumn(idType as any)
     id: T extends 'increment' | 'rowid' | 'identity' ? number : string;
 
-    @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+    @CreateDateColumn({ name: 'created_at', type: 'datetime' })
     createAt: Date;
 
-    @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+    @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
     updatedAt: Date;
 
     @DeleteDateColumn({
       name: 'deleted_at',
-      type: 'timestamptz',
+      type: 'datetime',
       nullable: true,
     })
-
     deletedAt: Date;
   }
 
@@ -47,7 +46,7 @@ export function BaseEntityNonePk() {
     })
     deletedAt: Date;
   }
-  
+
   return _BaseEntity;
 }
 /**

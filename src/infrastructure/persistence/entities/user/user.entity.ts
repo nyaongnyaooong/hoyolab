@@ -16,8 +16,7 @@ export class UserEntity extends BaseEntity('uuid') {
 
   @Column({
     comment: '마지막 캔들 시간',
-    primary: true,
-    type: 'timestamptz',
+    type: 'datetime',
   })
   password: string;
 }

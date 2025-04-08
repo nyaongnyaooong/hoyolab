@@ -30,6 +30,9 @@ if [ "$1" = "up" ]; then
     fi
 
     if [ "$2" = "dev" ]; then
+        docker-compose -f docker/docker-compose.yml down
+
+        docker-compose -f docker/docker-compose-dev.yml build --no-cache
         docker-compose -f docker/docker-compose-dev.yml up -d
         docker logs -f hoyolab-nest-dev
 

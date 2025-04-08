@@ -82,4 +82,33 @@ export class DiscordService {
     }
     return await channel.send({ embeds: [embed] });
   }
+
+  async sendWebhookMessage(input: {
+    webhookUrl: string;
+    body: {
+      content?: string;
+      embeds?: any[];
+      attachments?: any[];
+    };
+  }) {
+    const { webhookUrl, body } = input;
+
+    try {
+      await axios.post(webhookUrl, body, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return {
+        resCode: 0,
+        message: '메세지 전송 성공',
+      };
+    } catch (error) {
+      return {
+        resCode: -1000,
+        message: `메세지 전송 실패 - ${error.message}}`,
+      };
+    }
+  }
 }
