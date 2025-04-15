@@ -39,9 +39,9 @@ export class SchedulerCron {
     });
   }
 
-  @Cron('59 2/3 * * *')
-  // @Cron(CronExpression.EVERY_10_SECONDS)
-  async mabinogiBarrierAlarm() {
+  // 평일
+  @Cron('58 8,17,19,20,21,23 * * 1-5')
+  async mabinogiAlarmWeekday() {
     const barrierTime = DateTime.now()
       .plus({ minutes: 30 })
       .startOf('hour')
@@ -68,29 +68,6 @@ export class SchedulerCron {
             color: 0x00ff00, // 초록색 (성공)
             // color: 0xff0000,  // 빨간색 (에러)
             // color: 0xffff00,  // 노란색 (경고)
-
-            // fields: [
-            //   {
-            //     name: '상태',
-            //     value: '✅ 성공',
-            //     inline: true,
-            //   },
-            //   {
-            //     name: '타입',
-            //     value: '시스템 알림',
-            //     inline: true,
-            //   },
-            // ],
-            // thumbnail: {
-            //   url: 'https://your-thumbnail-url.com/image.png',
-            // },
-            // image: {
-            //   url: 'https://your-image-url.com/image.png',
-            // },
-            // author: {
-            //   name: '시스템 봇',
-            //   icon_url: 'https://your-icon-url.com/icon.png',
-            // },
             footer: {
               text: `${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
             },
@@ -100,57 +77,94 @@ export class SchedulerCron {
         ],
       },
     });
-    console.log(sendDiscordWebhook);
 
-    const sendSlack = await this.slackService.sendMessageToChannel({
-      webhookUrl: process.env.SLACK_WEBHOOK_URL,
+    // const sendSlack = await this.slackService.sendMessageToChannel({
+    //   webhookUrl: process.env.SLACK_WEBHOOK_URL,
+    //   body: {
+    //     // text 필드는 알림이 올 때 보이는 폴백 메시지로 사용됩니다
+    //     attachments: [
+    //       {
+    //         color: '#36a64f',
+    //         fields: [
+    //           {
+    //             title: '📣 결계 알림',
+    //             value: message,
+    //             short: true,
+    //           },
+    //         ],
+    //         footer: 'GitHub Actions',
+    //         // footer_icon: 'https://github.githubassets.com/favicon.ico',
+    //         ts: `🕐 ${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
+    //       },
+    //     ],
+    //     text: message,
+    //   },
+    // });
+
+    return;
+  }
+
+  // 주말
+  @Cron('58 2,5,8,11,14,17,19,20,21,23 * * 0,6')
+  async mabinogiAlarmWeekend() {
+    const barrierTime = DateTime.now()
+      .plus({ minutes: 30 })
+      .startOf('hour')
+      .toFormat('HH:mm');
+
+    const message = `${barrierTime} 결계 알림`;
+
+    // const sendDiscord = await this.discordService.sendEmbedMessageToChannel({
+    //   channelId,
+    //   title: '결계 알림',
+    //   message,
+    // });
+    // console.log(sendDiscord);
+
+    const sendDiscordWebhook = await this.discordService.sendWebhookMessage({
+      webhookUrl: process.env.DISCORD_WEBHOOK_URL,
       body: {
-        // blocks: [
-        //   {
-        //     type: 'header',
-        //     text: {
-        //       type: 'plain_text',
-        //       text: '📣 결계 알림',
-        //       emoji: true,
-        //     },
-        //   },
-        //   {
-        //     type: 'section',
-        //     text: {
-        //       type: 'mrkdwn',
-        //       text: message,
-        //     },
-        //   },
-        //   {
-        //     type: 'context',
-        //     elements: [
-        //       {
-        //         type: 'mrkdwn',
-        //         text: `🕐 ${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
-        //       },
-        //     ],
-        //   },
-        // ],
-        // text 필드는 알림이 올 때 보이는 폴백 메시지로 사용됩니다
-        attachments: [
+        // content: '결계 알림',
+        embeds: [
           {
-            color: '#36a64f',
-            fields: [
-              {
-                title: '📣 결계 알림',
-                value: message,
-                short: true,
-              },
-            ],
-            footer: 'GitHub Actions',
-            // footer_icon: 'https://github.githubassets.com/favicon.ico',
-            ts: `🕐 ${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
+            title: '📣 결계 알림',
+            description: message,
+            // description: `@everyone\n${message}`,
+            color: 0x00ff00, // 초록색 (성공)
+            // color: 0xff0000,  // 빨간색 (에러)
+            // color: 0xffff00,  // 노란색 (경고)
+            footer: {
+              text: `${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
+            },
+
+            timestamp: new Date().toISOString(),
           },
         ],
-        text: message,
       },
     });
-    console.log(sendSlack);
+
+    // const sendSlack = await this.slackService.sendMessageToChannel({
+    //   webhookUrl: process.env.SLACK_WEBHOOK_URL,
+    //   body: {
+    //     // text 필드는 알림이 올 때 보이는 폴백 메시지로 사용됩니다
+    //     attachments: [
+    //       {
+    //         color: '#36a64f',
+    //         fields: [
+    //           {
+    //             title: '📣 결계 알림',
+    //             value: message,
+    //             short: true,
+    //           },
+    //         ],
+    //         footer: 'GitHub Actions',
+    //         // footer_icon: 'https://github.githubassets.com/favicon.ico',
+    //         ts: `🕐 ${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`,
+    //       },
+    //     ],
+    //     text: message,
+    //   },
+    // });
 
     return;
   }
