@@ -205,6 +205,7 @@ export class SchedulerCron {
 
       if (resultCode === -2017) {
         msg = `[Auto Redeem] Already redeemed coupon: ${coupon.code}`;
+        await this.genshinService.setRedeemed(coupon.code);
       }
 
       if (resultCode === -2001) {
