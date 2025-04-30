@@ -178,7 +178,7 @@ export class SchedulerCron {
   }
 
   // 미입력 리딤 코드 확인 후 입력
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_MINUTE)
   async putNotRedeemedCoupon() {
     const coupons = await this.genshinService.getNotRedeemedCoupons();
 
