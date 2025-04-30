@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { DateTime } from 'luxon';
 import { HoyolabService } from './hoyolab.service';
+import { CodeRepository } from 'src/infrastructure/persistence/repositories/hoyolab/code.repository';
 
 @Injectable()
 export class GenshinService {
-  constructor(private readonly hoyolabService: HoyolabService) {}
+  constructor(
+    private readonly hoyolabService: HoyolabService,
+    private readonly codeRepository: CodeRepository,
+  ) {}
 
   async attendance() {
     const axiosInstance = this.hoyolabService.setAxiosInstance();
@@ -75,6 +79,36 @@ export class GenshinService {
     return couponCodes;
   }
 
+  async addCoupon(input: { code: string; type: 'genshin' }) {
+    return await this.codeRepository.addCoupon(input);
+  }
+
+  async addCouponString(input: { string: string; type: 'genshin' }) {
+    const { string } = input;
+    const codes = this.parseCodes(string);
+
+    let successCount = 0;
+    for (const code of codes) {
+      try {
+        await this.addCoupon({ code, type: 'genshin' });
+        successCount++;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (!successCount) {
+      throw new NotFoundException(`No available codes found : ${codes}`);
+    }
+
+    return 'OK';
+    // return await this.codeRepository.addCoupon(input);
+  }
+
+  async getNotRedeemedCoupons() {
+    return await this.codeRepository.getNotRedeemedCoupons();
+  }
+
   async redeemCoupon(couponCode: string) {
     const axiosInstance = this.hoyolabService.setAxiosInstance();
     const newCookie = this.hoyolabService.makeCookie();
@@ -96,6 +130,18 @@ export class GenshinService {
     return response.data;
   }
 
+  async setRedeemed(couponCode: string) {
+    return await this.codeRepository.setRedeemed(couponCode);
+  }
+
+  async setExpired(couponCode: string) {
+    return await this.codeRepository.setExpired(couponCode);
+  }
+
+  async setDelete(couponCode: string) {
+    return await this.codeRepository.setDelete(couponCode);
+  }
+
   private isSuccess(responseData: any) {
     return responseData?.retcode === 0;
   }
@@ -106,5 +152,11 @@ export class GenshinService {
       'https://bbs-api-os.hoyolab.com/community/painter/wapi/circle/channel/guide/material?game_id=2',
     redeemCoupon:
       'https://public-operation-hk4e.hoyoverse.com/common/apicdkey/api/webExchangeCdkey',
+  };
+
+  private parseCodes = (string: string): string[] => {
+    const regex = /code=([A-Z]+)/g;
+    const matches = [...string.matchAll(regex)];
+    return matches.map((match) => match[1]);
   };
 }

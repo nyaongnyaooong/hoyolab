@@ -50,15 +50,17 @@ export class HoyolabService {
    */
   makeCookie() {
     // todo 토큰 가져와야함
-    const cookieToken = process.env.COOKIE_TOKEN;
+    const cookieToken = process.env.COOKIE_TOKEN_V2;
     const ltoken = process.env.LTOKEN;
     const ltuid = process.env.LTUID;
+    const accountMidV2 = process.env.MID_V2;
 
     return [
       `cookie_token_v2=${cookieToken};`,
       `ltoken_v2=${ltoken};`,
       `ltuid_v2=${ltuid};`,
       `account_id_v2=${ltuid};`,
+      `account_mid_v2=${accountMidV2};`,
     ];
   }
   /**
@@ -78,6 +80,8 @@ export class HoyolabService {
     const updatedCookies = [existingCookies, newCookies]
       .filter(Boolean)
       .join('; ');
+
+      console.log(updatedCookies)
 
     axiosInstance.defaults.headers.common['cookie'] = updatedCookies;
     return axiosInstance;

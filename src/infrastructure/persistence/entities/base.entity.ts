@@ -33,15 +33,15 @@ export function BaseEntity<T extends IdType>(idType: T) {
 export function BaseEntityNonePk() {
   @Entity()
   abstract class _BaseEntity {
-    @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+    @CreateDateColumn({ name: 'created_at', type: 'datetime' })
     createAt: Date;
 
-    @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+    @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
     updatedAt: Date;
 
     @DeleteDateColumn({
       name: 'deleted_at',
-      type: 'timestamptz',
+      type: 'datetime',
       nullable: true,
     })
     deletedAt: Date;

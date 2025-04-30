@@ -4,6 +4,7 @@ import { SchedulerService } from '../../application/scheduler.service';
 import { DiscordService } from 'src/modules/discord/application/discord.service';
 import { DateTime } from 'luxon';
 import { SlackService } from 'src/modules/slack/application/slack.service';
+import { GenshinService } from 'src/modules/hoyolab/application/genshin.service';
 
 @Injectable()
 export class SchedulerCron {
@@ -11,6 +12,7 @@ export class SchedulerCron {
     private readonly schedulerService: SchedulerService,
     private readonly discordService: DiscordService,
     private readonly slackService: SlackService,
+    private readonly genshinService: GenshinService,
     // private readonly logger: Logger,
   ) {}
 
@@ -170,9 +172,73 @@ export class SchedulerCron {
   }
 
   // 공식 리딤 코드 확인 후 입력
-  @Cron(CronExpression.EVERY_DAY_AT_6AM)
+  @Cron(CronExpression.EVERY_DAY_AT_9PM)
   async putOfficialCoupon() {
     return await this.schedulerService.putOfficialCoupon();
+  }
+
+  // 미입력 리딤 코드 확인 후 입력
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async putNotRedeemedCoupon() {
+    const coupons = await this.genshinService.getNotRedeemedCoupons();
+
+    if (coupons.length === 0) {
+      console.log('[Auto Redeem] No coupons found');
+      return;
+    }
+
+    console.log(`[Auto Redeem] Found ${coupons.length} coupons`);
+
+    let totalMsg = '';
+    for (const coupon of coupons) {
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+
+      const result = await this.genshinService.redeemCoupon(coupon.code);
+      console.log(result);
+      const resultCode = result?.retcode;
+      let msg = '';
+
+      if (!resultCode) {
+        msg = `[Auto Redeem] Successfully redeemed coupon: ${coupon.code}`;
+        await this.genshinService.setRedeemed(coupon.code);
+      }
+
+      if (resultCode === -2017) {
+        msg = `[Auto Redeem] Already redeemed coupon: ${coupon.code}`;
+      }
+
+      if (resultCode === -2001) {
+        msg = `[Auto Redeem] Expired coupon: ${coupon.code}`;
+        await this.genshinService.setExpired(coupon.code);
+      }
+
+      if (resultCode === -2003) {
+        msg = `[Auto Redeem] Invalid redeem coupon: ${coupon.code}`;
+        await this.genshinService.setDelete(coupon.code);
+      }
+
+      if (resultCode === -2016) {
+        console.log(`[Auto Redeem] timeout to redeem coupon: ${coupon.code}`);
+        await new Promise((resolve) => setTimeout(resolve, 6000));
+        continue;
+      }
+
+      if (!msg) {
+        msg = `[Auto Redeem] Failed to redeem coupon: ${coupon.code}`;
+      }
+
+      console.log(msg);
+      totalMsg += msg + '\n';
+    }
+
+    const channelId = process.env.DISCORD_CHANNEL_ID;
+    await this.discordService.sendEmbedMessageToChannel({
+      channelId,
+      title: '리딤 코드 자동 입력 결과',
+      message: totalMsg,
+    });
+
+    return;
   }
 
   private testKey = 0;

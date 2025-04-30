@@ -25,24 +25,11 @@ export class SchedulerService {
     if (!couponCodes.length)
       return { result: false, message: '쿠폰 코드가 없습니다.' };
 
-    const couponResult = {};
-    let index = 0;
     for (const couponCode of couponCodes) {
-      couponResult[couponCode] =
-        await this.genshinService.redeemCoupon(couponCode);
-
-      if (index === couponCodes.length - 1) {
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-      }
-      index++;
+      await this.genshinService.addCoupon({
+        code: couponCode,
+        type: 'genshin',
+      });
     }
-    const text = JSON.stringify(couponResult);
-
-    const channelId = process.env.DISCORD_CHANNEL_ID;
-    return await this.discordService.sendEmbedMessageToChannel({
-      channelId,
-      title: '공식 쿠폰 리딤 결과',
-      message: text,
-    });
   }
 }
